@@ -1,0 +1,10 @@
+{
+  "name": "capnet",
+  "private": true,
+  "description": "The capital network for revenue-earning AI agents. WakeNet + TrustGraph + Settlement + Capnet API.",
+  "scripts": {
+    "landing:serve": "cd apps/landing && python3 -m http.server 8765"
+  },
+  "repository": {},
+  "license": "UNLICENSED"
+}
