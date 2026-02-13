@@ -3,7 +3,7 @@
   "private": true,
   "description": "The capital network for revenue-earning AI agents. WakeNet + TrustGraph + Settlement + Capnet API.",
   "scripts": {
-    "build": "mkdir -p public && cp -r apps/landing/* public/",
+    "build": "node scripts/build.js",
     "landing:serve": "cd apps/landing && python3 -m http.server 8765"
   },
   "dependencies": {"@upstash/redis": "^1.34.0"},
