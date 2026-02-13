@@ -22,6 +22,20 @@ Deploy from **repo root** so both the landing page and the Capnet API are served
 
 The waitlist form POSTs to `/api/join` on the same domain. No CORS needed.
 
+### Viewing waitlist signups
+
+Waitlist emails (“Just Want Updates?”) are stored in **Vercel KV**. Each signup is appended to a JSON array.
+
+- **Key:** `capnet:joinEvents` (or `{KV_PREFIX}:joinEvents` if you set `KV_PREFIX`).
+- **Value:** JSON array of `{ email, joinedAt }` objects.
+
+**Where to see who joined:**
+
+1. **Vercel Dashboard** → your project → **Storage** → open the KV store → **Data** tab. Search or browse for the key `capnet:joinEvents`.
+2. **Upstash Console** (if you use Upstash): open the linked Redis database and run `GET capnet:joinEvents` to see the JSON array.
+
+There is no in-app admin UI for the waitlist; use the KV/Redis UI or export the value for a CSV.
+
 ### MCP users
 
 Set `CAPNET_API_URL` to your API URL. With the custom domain: **`https://capnet.work`** (no trailing slash). See [CUSTOM-DOMAIN.md](CUSTOM-DOMAIN.md) to add capnet.work in Vercel.

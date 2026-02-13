@@ -57,9 +57,11 @@ body {
   justify-content: space-between;
   padding-top: var(--space);
   padding-bottom: var(--space);
+  gap: var(--space);
 }
 
 .logo {
+  flex-shrink: 0;
   font-family: var(--serif);
   font-size: 1.5rem;
   font-weight: 400;
@@ -71,8 +73,10 @@ body {
 .nav {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 1.5rem;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .nav a {
@@ -583,10 +587,21 @@ body {
   }
   .site-header .wrap {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .nav {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
     gap: 1rem;
   }
-  .nav { width: 100%; }
+  .nav a {
+    white-space: nowrap;
+  }
   .value-divider { display: none; }
   .hero-ctas { flex-direction: column; }
   .hero-ctas .btn { width: 100%; max-width: 280px; }

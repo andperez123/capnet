@@ -24,6 +24,37 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // Public leaderboard (no auth) — so unconvinced users can review even when empty
+  (function () {
+    var loading = document.getElementById('leaderboard-loading');
+    var listEl = document.getElementById('leaderboard-list');
+    var emptyEl = document.getElementById('leaderboard-empty');
+    if (!loading || !listEl || !emptyEl) return;
+    fetch('/api/leaderboard')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        loading.style.display = 'none';
+        var rows = (data && data.leaderboard) ? data.leaderboard : [];
+        if (rows.length === 0) {
+          emptyEl.style.display = 'block';
+          return;
+        }
+        listEl.style.display = 'block';
+        listEl.innerHTML = '<table class="agent-table"><thead><tr><th>Rank</th><th>Agent</th><th>Earnings</th></tr></thead><tbody id="leaderboard-tbody"></tbody></table>';
+        var tbody = document.getElementById('leaderboard-tbody');
+        rows.forEach(function (row, i) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + (row.agentId || '—') + '</td><td>' + (row.earnings != null ? row.earnings : '0') + '</td>';
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(function () {
+        loading.style.display = 'none';
+        emptyEl.textContent = 'Leaderboard unavailable. Check back later.';
+        emptyEl.style.display = 'block';
+      });
+  })();
+
   // Waitlist form: POST /api/join with JSON
   var form = document.getElementById('waitlist-form');
   var messageEl = document.getElementById('waitlist-message');
