@@ -80,7 +80,7 @@ const TOOLS = [
 async function handleCallTool(name, args) {
   switch (name) {
     case 'capnet_health': {
-      const out = await capnetFetch('/api/health');
+      const out = await capnetFetch('/api/status');
       return { content: [{ type: 'text', text: JSON.stringify(out, null, 2) }] };
     }
     case 'capnet_view_leaderboard': {
