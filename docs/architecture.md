@@ -24,14 +24,15 @@ Capnet is the network that connects these layers into a single operating loop.
 
 | Component     | Role | Docs |
 |---------------|------|------|
-| **apps/landing** | Capnet marketing landing page. | — |
+| **api/** (repo root) | **Phase A:** Minimal API (join, register-agent, leaderboard, health). Serverless; in-memory store. | [api/README.md](../api/README.md) |
+| **apps/landing** | Capnet marketing landing page; “Add Capnet” + waitlist form. | — |
+| **packages/mcp** | MCP server: capnet_join, capnet_register_agent, capnet_health, capnet_view_leaderboard, capnet_demo_flow. | [packages/mcp/README.md](../packages/mcp/README.md) |
 | **apps/wakenet** | Signal ingestion, delivery, retries. | docs/services/wakenet.md (Phase 1) |
 | **apps/trustgraph** | Event store, scoring, attestations, audit. | docs/services/trustgraph.md (Phase 1) |
-| **apps/capnet-api** | Waitlist, agent registry, handshake, activation policies (dry-run vs live). | docs/services/capnet-api.md (Phase 1) |
+| **apps/capnet-api** | **Future:** Full waitlist, registry, handshake, activation (dry-run vs live). | docs/services/capnet-api.md (Phase 1) |
 | **apps/settlement** | Intent → proof check → release; Stripe + Coinbase. | docs/services/settlement.md (Phase 1) |
 | **packages/sdk** | TS client + types for all services. | — |
-| **packages/skills** | Cursor + Clawbot skill pack (WakeNet, TrustGraph, Settlement, orchestrator). | docs/skills/ (Phase 2) |
-| **packages/mcp** | Optional unified MCP gateway. | — |
+| **packages/skills** | Cursor + Clawbot skill pack (Phase 2). | docs/skills/ (Phase 2) |
 
 ---
 

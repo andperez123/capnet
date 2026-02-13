@@ -446,6 +446,104 @@ body {
   margin: 0;
 }
 
+.cta-alt a {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+/* Add Capnet / MCP install */
+.mcp-install { margin-top: 1rem; }
+.mcp-step { margin: 0.75rem 0 0; color: var(--text-muted); font-size: 0.95rem; }
+.mcp-step code { font-size: 0.9em; background: var(--bg-alt); padding: 0.15rem 0.4rem; border-radius: 4px; }
+.mcp-code {
+  display: block;
+  margin: 0.5rem 0 0;
+  padding: 1rem;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* Waitlist form */
+.waitlist-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  max-width: 28rem;
+  margin: 0 auto 1rem;
+}
+.waitlist-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6rem 1rem;
+  font-family: var(--sans);
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.waitlist-message {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  min-height: 1.5em;
+}
+.waitlist-message--ok { color: var(--text-muted); }
+.waitlist-message--error { color: #b91c1c; }
+
+/* Console */
+.console-signin { max-width: 28rem; }
+.console-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.console-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: baseline; }
+.metric-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.25rem; }
+.metric-value { font-weight: 600; }
+.metric-muted { font-weight: 400; color: var(--text-muted); }
+.status-pill {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.status-pill--ok { background: #dcfce7; color: #166534; }
+.status-pill--degraded { background: #fef3c7; color: #92400e; }
+.status-pill--error { background: #fee2e2; color: #b91c1c; }
+.status-pill--pending { background: var(--bg-alt); color: var(--text-muted); }
+.console-grid { margin-top: 1.5rem; }
+.agent-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.agent-table th, .agent-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.agent-table th {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.agent-table tbody tr { cursor: pointer; }
+.agent-table tbody tr:hover { background: var(--bg-alt); }
+.console-empty { color: var(--text-muted); padding: 1.5rem 0; }
+.console-detail-metrics { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 0.5rem; }
+.console-detail-metrics .metric { display: flex; flex-direction: column; gap: 0.15rem; }
+
 .site-footer {
   padding: var(--space-lg) 0;
   border-top: 1px solid var(--border);

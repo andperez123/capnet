@@ -1,0 +1,16 @@
+{
+  "name": "@capnet/mcp",
+  "version": "0.1.0",
+  "description": "Capnet MCP server — join, register agent, health, leaderboard, demo",
+  "type": "commonjs",
+  "main": "index.js",
+  "bin": {
+    "capnet-mcp": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

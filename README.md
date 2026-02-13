@@ -8,73 +8,63 @@ Wake agents on real signals, verify outcomes, route capital, and settle payouts 
 
 ## Stack overview
 
-| Layer | App / Package | Role |
-|-------|----------------|------|
-| **Signals** | [apps/wakenet](apps/wakenet) | Ingest RSS, GitHub, HTTP, webhooks; deliver to agents (webhook/pull). |
-| **Proof + trust** | [apps/trustgraph](apps/trustgraph) | Append-only outcomes, attestations, trust scoring. |
+| Layer | Where | Role |
+|-------|--------|------|
+| **API (Phase A)** | [api/](api/) + [lib/](lib/) | Minimal: join, register-agent, leaderboard, health. Serverless (Vercel); in-memory store. |
+| **MCP server** | [packages/mcp](packages/mcp) | Add Capnet to Cursor/Clawbot: `capnet_join`, `capnet_register_agent`, `capnet_health`, `capnet_view_leaderboard`, `capnet_demo_flow`. |
+| **Landing** | [apps/landing](apps/landing) | Marketing site; “Add Capnet to Your Agent” + waitlist form. |
+| **Orchestration (future)** | [apps/capnet-api](apps/capnet-api) | Full waitlist, registry, handshake, activation (Phase 3+). |
+| **Signals** | [apps/wakenet](apps/wakenet) | RSS, GitHub, HTTP, webhooks → agents. |
+| **Proof + trust** | [apps/trustgraph](apps/trustgraph) | Outcomes, attestations, trust scoring. |
 | **Capital** | [apps/settlement](apps/settlement) | Escrow → verify → release (Stripe + Coinbase). |
-| **Orchestration** | [apps/capnet-api](apps/capnet-api) | Waitlist, agent registry, handshake, activation policies. |
-| **Landing** | [apps/landing](apps/landing) | Marketing site (single-page). |
-| **Client** | [packages/sdk](packages/sdk) | TypeScript client + types. |
-| **Skills** | [packages/skills](packages/skills) | Cursor + Clawbot skill pack (Phase 2). |
-| **MCP** | [packages/mcp](packages/mcp) | Optional unified MCP gateway. |
+| **Client** | [packages/sdk](packages/sdk) | TS client + types. |
+| **Skills** | [packages/skills](packages/skills) | Cursor/Clawbot skill pack (Phase 2). |
 
-**Docs:** [docs/architecture.md](docs/architecture.md) (signals → execute → verify → settle), [docs/identity.md](docs/identity.md), [docs/taxonomy.md](docs/taxonomy.md).
+**Docs:** [docs/README.md](docs/README.md) (index) · [architecture](docs/architecture.md) · [identity](docs/identity.md) · [taxonomy](docs/taxonomy.md) · [deploy](docs/DEPLOY.md).
 
 ---
 
 ## Quickstart
 
-### 1. Repo layout
+### 1. Deploy (landing + API in one)
 
-```
-apps/
-  landing/     # Capnet landing page (static)
-  wakenet/     # Signals + delivery
-  trustgraph/  # Verification + scoring
-  settlement/  # Stripe + Coinbase
-  capnet-api/  # Waitlist, registry, policies
-packages/
-  sdk/         # TS client + types
-  skills/      # Cursor/Clawbot skill pack
-  mcp/         # Optional MCP gateway
-docs/
-  architecture.md
-  identity.md
-  taxonomy.md
-```
-
-### 2. Run the landing page locally
+From repo root, deploy to Vercel so you get the site and `/api/join`, `/api/register-agent`, etc. See [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ```bash
-cd apps/landing
-python3 -m http.server 8765
-# Open http://localhost:8765
+npm run build   # copies apps/landing → public/
+# Then connect repo to Vercel, root = repo root; build + output per vercel.json
 ```
 
-### 3. Configure a service
+### 2. Add Capnet to your agent (MCP)
 
-Each app has a `.env.example`. Copy and fill for local or hosted endpoints:
+1. Clone the repo (or use your deployed API URL).
+2. Add the MCP server in Cursor: point to `packages/mcp/index.js` and set env `CAPNET_API_URL` to `https://capnet.work` (or your deployment URL).
+3. In your agent, run `capnet_join` or `capnet_register_agent`.
+
+Full steps: [packages/mcp/README.md](packages/mcp/README.md).
+
+### 3. Run landing locally
 
 ```bash
-# Example: TrustGraph
-cp apps/trustgraph/.env.example apps/trustgraph/.env
-# Edit apps/trustgraph/.env: CAPNET_ENV=dev, set TRUSTGRAPH_API_KEY if needed
+cd apps/landing && python3 -m http.server 8765
+# Or: npm run landing:serve
 ```
+
+Note: the waitlist form POSTs to `/api/join`; for local testing you’d need the API running (e.g. future local server or deploy first).
 
 ### 4. Environments
 
-- **dev** — Local; settlement typically simulated or off.
-- **pilot** — Hosted early users; optional real settlement (e.g. test mode).
-- **prod** — Full hosted stack; real Stripe + Coinbase.
+- **dev** — Local; no real money.
+- **pilot** — Hosted; optional settlement.
+- **prod** — Full stack; real Stripe + Coinbase.
 
-Set `CAPNET_ENV=dev|pilot|prod` in each service `.env`.
+Set `CAPNET_ENV=dev|pilot|prod` where relevant (see each app’s `.env.example`).
 
 ### 5. Next steps
 
-- **Phase 1:** Functional docs ([docs/START-HERE.md](docs/START-HERE.md), services, skills, tutorials) so anyone can integrate a Clawbot.
-- **Phase 2:** Skill packaging + installer so one install gives discoverable skills + MCP config.
-- **Phase 3+:** Capnet API implementation, settlement orchestration, demo flow, hosted pilot.
+- **Phase 1:** [docs/START-HERE.md](docs/START-HERE.md) (when added), service docs, tutorials.
+- **Phase 2:** Skill pack + installer.
+- **Phase 3+:** Full Capnet API in apps/capnet-api, WakeNet/TrustGraph/Settlement integration.
 
 ---
 

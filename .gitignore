@@ -12,6 +12,7 @@ build/
 .next/
 out/
 .vercel
+public/
 
 # Logs and debug
 *.log
