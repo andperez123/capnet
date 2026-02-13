@@ -546,6 +546,7 @@ body {
 
 .site-footer {
   padding: var(--space-lg) 0;
+  padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--border);
   background: var(--bg-alt);
 }
@@ -577,6 +578,9 @@ body {
 .footer-nav a:hover { color: var(--text); }
 
 @media (max-width: 640px) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
   .site-header .wrap {
     flex-direction: column;
     align-items: flex-start;
@@ -588,4 +592,7 @@ body {
   .hero-ctas .btn { width: 100%; max-width: 280px; }
   .arch-flow { flex-direction: column; align-items: flex-start; }
   .arch-arrow { transform: rotate(90deg); margin-left: 0.5rem; }
+  .site-footer {
+    padding-bottom: max(2rem, calc(1.5rem + env(safe-area-inset-bottom, 0px)));
+  }
 }

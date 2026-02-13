@@ -6,23 +6,21 @@
 
 Deploy from **repo root** so both the landing page and the Capnet API are served from the same origin.
 
-1. **Build:** `npm run build` copies `apps/landing` to `public/`.
-2. **Output:** `public/` (static site).
-3. **API:** The `api/` folder at repo root becomes serverless routes:
-   - `/api/join` — waitlist or full join
-   - `/api/register-agent` — register an agent
-   - `/api/leaderboard` — leaderboard
-   - `/api/health` — health check
+1. **Static site:** Served from `apps/landing/` (index.html, styles, script).
+2. **API:** The `api/` folder at repo root becomes serverless routes (`/api/join`, `/api/status`, etc.).
 
-### Vercel setup
+### Vercel setup (required for waitlist + API)
 
-1. Go to [vercel.com](https://vercel.com) and sign in with GitHub.
-2. **Add New Project** → Import your GitHub repo.
-3. **Root Directory:** leave **empty** (repo root).
-4. **Build Command** and **Output Directory:** use the values from `vercel.json` (or set Build Command to `npm run build`, Output Directory to `public`).
-5. Deploy.
+1. Go to [vercel.com](https://vercel.com) → your project → **Settings**.
+2. **General → Root Directory:** leave **empty** (or `.`).  
+   **If this is set to `apps/landing`, `/api/*` will 404** because `api/` lives at repo root.
+3. **Build & Output Settings:**
+   - **Framework Preset:** Other / No Framework
+   - **Build Command:** leave empty (or `echo "no build"`)
+   - **Output Directory:** `apps/landing`
+4. Save. Redeploy.
 
-The waitlist form will POST to `/api/join` on the same domain. No CORS needed.
+The waitlist form POSTs to `/api/join` on the same domain. No CORS needed.
 
 ### MCP users
 
