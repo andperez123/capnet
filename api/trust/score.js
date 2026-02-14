@@ -63,29 +63,47 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, ...cached, cached: true });
   }
 
+  const base = config.trustgraph.url.replace(/\/$/, '');
+  const encodedId = encodeURIComponent(agentId);
+  const windowParam = encodeURIComponent(window);
   const start = Date.now();
-  const url = config.trustgraph.url.replace(/\/$/, '') + '/score?agentId=' + encodeURIComponent(agentId) + '&window=' + encodeURIComponent(window);
+
+  // TrustGraph: try /trust/agents/{id} then /agent/{id} (public profile returns composite + scores)
+  const urlsToTry = [
+    base + '/trust/agents/' + encodedId + '?window=' + windowParam,
+    base + '/agent/' + encodedId + '?window=' + windowParam,
+    base + '/score?agentId=' + encodedId + '&window=' + windowParam,
+  ];
 
   const controller = new AbortController();
   const to = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
-    const tgRes = await fetch(url, {
-      headers: config.trustgraph.apiKey ? { Authorization: `Bearer ${config.trustgraph.apiKey}` } : {},
-      signal: controller.signal,
-    });
+    let tgRes = null;
+    let data = {};
+    for (const url of urlsToTry) {
+      tgRes = await fetch(url, {
+        headers: config.trustgraph.apiKey ? { Authorization: `Bearer ${config.trustgraph.apiKey}` } : {},
+        signal: controller.signal,
+      });
+      data = await tgRes.json().catch(() => ({}));
+      if (tgRes.ok && (data.composite != null || data.score != null || data.value != null)) break;
+    }
     clearTimeout(to);
     const latencyMs = Date.now() - start;
 
-    const data = await tgRes.json().catch(() => ({}));
+    const score = data.composite ?? data.score ?? data.value ?? null;
     const result = {
-      status: tgRes.ok ? 'ok' : 'error',
-      score: data.score ?? data.value ?? null,
-      updatedAt: data.updatedAt ?? new Date().toISOString(),
+      status: tgRes && tgRes.ok ? 'ok' : 'error',
+      score,
+      updatedAt: data.lastVerified ?? data.updatedAt ?? new Date().toISOString(),
       latencyMs,
       checkedAt: new Date().toISOString(),
+      ...(data.scores && { scores: data.scores }),
+      ...(data.rank7d != null && { rank7d: data.rank7d }),
+      ...(data.proofCount != null && { proofCount: data.proofCount }),
     };
 
-    if (tgRes.ok) {
+    if (tgRes && tgRes.ok) {
       await setTrustCache(agentId, window, result, CACHE_TTL_SEC);
     }
 
