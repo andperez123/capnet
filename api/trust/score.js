@@ -9,7 +9,7 @@ const { parseSessionFromCookie } = require('../../lib/session');
 const { getConfig } = require('../../lib/config');
 
 const TIMEOUT_MS = 5000;
-const CACHE_TTL_SEC = 90;
+const CACHE_TTL_SEC = 30; // short TTL so cache is fallback only; fresh fetch preferred
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', process.env.CAPNET_CORS_ORIGIN || '*');
@@ -58,25 +58,21 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ ok: true, status: 'off' });
   }
 
-  const cached = await getTrustCache(agentId, window);
-  if (cached) {
-    return res.status(200).json({ ok: true, ...cached, cached: true });
-  }
-
   const base = config.trustgraph.url.replace(/\/$/, '');
   const encodedId = encodeURIComponent(agentId);
   const windowParam = encodeURIComponent(window);
   const start = Date.now();
 
-  // TrustGraph: try /trust/agents/{id} then /agent/{id} (public profile returns composite + scores)
+  // Fetch TrustGraph first every time; use KV cache only when fetch fails
   const urlsToTry = [
     base + '/trust/agents/' + encodedId + '?window=' + windowParam,
     base + '/agent/' + encodedId + '?window=' + windowParam,
     base + '/score?agentId=' + encodedId + '&window=' + windowParam,
   ];
 
+  let to;
   const controller = new AbortController();
-  const to = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  to = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     let tgRes = null;
     let data = {};
@@ -105,12 +101,22 @@ module.exports = async function handler(req, res) {
 
     if (tgRes && tgRes.ok) {
       await setTrustCache(agentId, window, result, CACHE_TTL_SEC);
+      return res.status(200).json({ ok: true, ...result });
     }
 
+    // TrustGraph fetch failed: return cached if available, else error
+    const cached = await getTrustCache(agentId, window);
+    if (cached) {
+      return res.status(200).json({ ok: true, ...cached, cached: true });
+    }
     return res.status(200).json({ ok: true, ...result });
   } catch (e) {
     clearTimeout(to);
     const latencyMs = Date.now() - start;
+    const cached = await getTrustCache(agentId, window);
+    if (cached) {
+      return res.status(200).json({ ok: true, ...cached, cached: true });
+    }
     return res.status(200).json({
       ok: true,
       status: 'error',
