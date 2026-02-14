@@ -16,6 +16,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Method not allowed' });
   }
 
+  const debug = req.query?.debug === '1' || req.query?.debug === 'true';
+
   if (!useKv()) {
     return res.status(503).json({ ok: false, error: 'KV_REQUIRED' });
   }
@@ -43,6 +45,17 @@ module.exports = async function handler(req, res) {
       createdAt: operator.createdAt,
     });
   } catch (e) {
-    return res.status(500).json({ ok: false, error: 'Server error' });
+    console.error('[operator/session]', e.message || e);
+    const msg = e.message || String(e);
+    const msgLower = msg.toLowerCase();
+    const hint =
+      msgLower && (msgLower.includes('token') || msgLower.includes('auth') || msgLower.includes('403') || msgLower.includes('401') || msgLower.includes('upstash') || msgLower.includes('redis') || msgLower.includes('unauthorized'))
+        ? ' Check KV_REST_API_TOKEN is the read-write token (not read-only) and env vars are set for Production.'
+        : '';
+    return res.status(500).json({
+      ok: false,
+      error: 'Server error.' + hint,
+      ...(debug && msg && { debug: msg }),
+    });
   }
 };
