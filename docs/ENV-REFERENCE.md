@@ -36,20 +36,30 @@ Only set if you want a different default (e.g. `IDENTITY_NAMESPACE=mycompany`).
 
 ---
 
-## Optional (future services)
+## TrustGraph (status + event push + score proxy)
 
-Used by `lib/config.js` and future WakeNet/TrustGraph/Settlement integration. Not required for the current API to run.
+Used for `GET /api/status` (trustgraph.status), `GET /api/trust/score`, and event push on register/verify. Set `TRUSTGRAPH_URL` to enable.
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| **TRUSTGRAPH_URL** | TrustGraph base URL | `https://trustgraph-production.up.railway.app` |
+| **TRUSTGRAPH_API_KEY** | Bearer token for TrustGraph API (if required) | — |
+| **TRUSTGRAPH_WEBHOOK_SECRET** | Secret for `X-Webhook-Secret` header when POSTing events | — |
+
+Capnet checks `GET {TRUSTGRAPH_URL}/trust/health` (fallback: `/health`). Events are POSTed to `{TRUSTGRAPH_URL}/trust/webhooks/capnet` with body `{ events: [...] }`. Without `TRUSTGRAPH_URL`, status shows `trustgraph.status: "off"` and events are not emitted.
+
+---
+
+## Optional (other services)
 
 | Variable | Description |
 |----------|-------------|
 | **WAKENET_URL** | Live WakeNet instance URL |
 | **WAKENET_API_KEY** | API key for WakeNet (if required) |
-| **TRUSTGRAPH_URL** | Live TrustGraph instance URL |
-| **TRUSTGRAPH_API_KEY** | API key for TrustGraph (if required) |
 | **SETTLEMENT_URL** | Settlement service URL (future) |
 | **SETTLEMENT_API_KEY** | Settlement API key (future) |
 
-Leave unset until those services exist. The health endpoint will show `wakenet` / `trustgraph` as disabled when URLs are not set.
+Leave unset until those services exist. The status endpoint will show `wakenet` / `settlement` as off when URLs are not set.
 
 ---
 

@@ -60,13 +60,11 @@ module.exports = async function handler(req, res) {
     details: verbose ? { store: useKv() ? 'kv' : 'memory' } : {},
   };
 
-  // TrustGraph
+  // TrustGraph — try /trust/health first, fallback to /health
   if (config.trustgraph.url) {
-    const tgRes = await fetchWithTimeout(
-      config.trustgraph.url.replace(/\/$/, '') + '/health',
-      {},
-      TIMEOUT_MS
-    );
+    const base = config.trustgraph.url.replace(/\/$/, '');
+    let tgRes = await fetchWithTimeout(base + '/trust/health', {}, TIMEOUT_MS);
+    if (!tgRes.ok && !tgRes.error) tgRes = await fetchWithTimeout(base + '/health', {}, TIMEOUT_MS);
     services.trustgraph = {
       status: tgRes.ok ? 'ok' : (tgRes.error === 'timeout' ? 'error' : 'error'),
       latencyMs: tgRes.latencyMs ?? null,
