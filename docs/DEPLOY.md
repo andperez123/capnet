@@ -42,6 +42,34 @@ Set `CAPNET_API_URL` to your API URL. With the custom domain: **`https://capnet.
 
 ---
 
+## Console dashboard (live data)
+
+The **Console** at `/console/` (Explore, Rankings, Activity, Dashboard, Agent profiles) uses the same deployment. It fetches real data from the API on the same origin — no extra config.
+
+### How to push live so the console shows real information
+
+1. **Push your code to GitHub** (see “Push to GitHub” below).
+2. **Connect the repo to Vercel** (if not already):
+   - [vercel.com](https://vercel.com) → Add New → Project → Import your repo.
+   - **Root Directory:** leave empty (`.`).
+   - **Output Directory:** `apps/landing`.
+   - **Build Command:** leave empty (or `npm run build` if you want `public/` used; with Output Directory `apps/landing`, Vercel serves from `apps/landing` directly).
+3. **Add environment variables** in Vercel → Project → Settings → Environment Variables:
+   - **Required for persistent data (leaderboard, agents, sign-in, activity):**
+     - `KV_REST_API_URL` — from Vercel Storage → KV (or Upstash).
+     - `KV_REST_API_TOKEN` — same place.
+   - **Recommended:** `CAPNET_API_URL` = your production URL (e.g. `https://capnet.work`), `CAPNET_ENV=prod`.
+   - **Optional:** `TRUSTGRAPH_URL` so status and trust scores work; see [ENV-REFERENCE.md](ENV-REFERENCE.md).
+4. **Deploy.** Vercel builds and serves:
+   - Landing at `/`
+   - Console at `/console/`
+   - API at `/api/*` (leaderboard, status, agents, activity, operator session, etc.).
+5. **Open the console:** `https://your-vercel-url.vercel.app/console/` (or your custom domain). Explore and Rankings use `/api/leaderboard`; sign-in and Dashboard use `/api/operator/session`, `/api/agents`, etc. All requests go to the same host, so they use real data automatically.
+
+Without KV, the API falls back to in-memory storage (data resets on cold starts). With KV, leaderboard, agents, and sign-in persist and the console shows live information.
+
+---
+
 ## Push to GitHub (first time)
 
 From repo root:
